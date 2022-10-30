@@ -9,6 +9,11 @@ def load_mnist():
     return mnist_dataset_train, mnist_dataset_test
 
 
-def show_ith_image(dataset, i):
-    x, _ = dataset[i]
-    plt.imshow(np.asarray(x), cmap='gray_r')
+def get_ith_img(dataset, idx, plot=False):
+    x, _ = dataset[idx]
+    img = np.asarray(x)
+    if plot:
+        plt.imshow(img, cmap='gray_r')
+        plt.show()
+    return img
+
