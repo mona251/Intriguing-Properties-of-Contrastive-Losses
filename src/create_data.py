@@ -1,19 +1,19 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from src.load_data import load_mnist, get_ith_img
 from src.utils import downsample_img
 import os
 import cv2 as cv
 
 
 def overlay_small_img_on_large_img_grid(small_img, large_img,
-                                        n_repetitions_small_img):
+                                        n_repetitions_small_img, plot=False):
     """
     Returns a grid of n repetitions of a small image above a large_img.
     Args:
         small_img: a small image
         large_img: a large image
         n_repetitions_small_img: n repetitions of small_image
+        plot: True to see the plot of the grid
 
     Returns:
         The large image with a grid of n repetitions of a small image above it.
@@ -60,22 +60,8 @@ def overlay_small_img_on_large_img_grid(small_img, large_img,
 
     large_img = cv.cvtColor(large_img, cv.COLOR_BGR2RGB)
     large_img = np.array(large_img)
-    plt.imshow(large_img)
-    plt.show()
+    if plot:
+        plt.imshow(large_img)
+        plt.show()
 
-
-def main():
-    n_repetitions_small_img = 9
-    large_img_path = "../data/img_trial/abc.png"
-    large_img = cv.imread(large_img_path)
-    mnist_dataset_train, mnist_dataset_test = load_mnist()
-    # TODO: sample randomly a digit img
-    # TODO: what about the dim of the mnist img? Is it fine to just
-    #  downsample/upsample it to the dimension of a cell of a grid?
-    small_img = get_ith_img(mnist_dataset_train, 0, plot=False)
-    overlay_small_img_on_large_img_grid(small_img, large_img,
-                                        n_repetitions_small_img)
-
-
-if __name__ == "__main__":
-    main()
+    return large_img
