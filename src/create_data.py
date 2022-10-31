@@ -9,6 +9,7 @@ import random
 def overlay_small_img_on_large_img_grid(small_img, large_img,
                                         num_cells_grid,
                                         n_repetitions_small_img,
+                                        is_large_img_grayscale=False,
                                         plot=False):
     """
     Returns a grid of n repetitions of a small image above a large_img.
@@ -18,7 +19,7 @@ def overlay_small_img_on_large_img_grid(small_img, large_img,
         num_cells_grid: number of cells in the grid
         n_repetitions_small_img: n repetitions of small_image (number of cells
          that will contain small_img)
-        seed: seed
+        is_large_img_grayscale: True if large_img is a grayscale image
         plot: True to see the plot of the grid
 
     Returns:
@@ -37,7 +38,8 @@ def overlay_small_img_on_large_img_grid(small_img, large_img,
 
     small_img = downsample_img(small_img, height_size_cell, width_size_cell,
                                grayscale=True)
-    backtorgb = cv.cvtColor(small_img, cv.COLOR_GRAY2RGB)
+    if not is_large_img_grayscale:
+        backtorgb = cv.cvtColor(small_img, cv.COLOR_GRAY2RGB)
 
     col_idx = 0
     row_idx = 0
@@ -57,22 +59,26 @@ def overlay_small_img_on_large_img_grid(small_img, large_img,
             cell_end_h = (row_idx + 1) * int(height_size_cell)
             cell_end_w = (col_idx + 1) * int(width_size_cell)
 
-            alpha_s = backtorgb[:, :, 2] / 255.0
-            alpha_l = 1.0 - alpha_s
-
-            for c in range(final_img.shape[-1]):
-                final_img[cell_start_h:cell_end_h, cell_start_w:cell_end_w, c] = \
-                    (alpha_s * backtorgb[:, :, c] +
-                     alpha_l * final_img[cell_start_h:cell_end_h,
-                                         cell_start_w:cell_end_w, c])
+            if is_large_img_grayscale:
+                final_img[cell_start_h:cell_end_h, cell_start_w:cell_end_w] = \
+                    (small_img + final_img[cell_start_h:cell_end_h,
+                                           cell_start_w:cell_end_w])
+            else:
+                alpha_s = backtorgb[:, :, 2] / 255.0
+                alpha_l = 1.0 - alpha_s
+                for c in range(final_img.shape[-1]):
+                    final_img[cell_start_h:cell_end_h, cell_start_w:cell_end_w, c] = \
+                        (alpha_s * backtorgb[:, :, c] +
+                         alpha_l * final_img[cell_start_h:cell_end_h,
+                                             cell_start_w:cell_end_w, c])
         counter += 1
         col_idx += 1
         if counter % num_cells_one_row == 0:
             row_idx += 1
             counter = 0
             col_idx = 0
-
-    final_img = cv.cvtColor(final_img, cv.COLOR_BGR2RGB)
+    if not is_large_img_grayscale:
+        final_img = cv.cvtColor(final_img, cv.COLOR_BGR2RGB)
     final_img = np.array(final_img)
     if plot:
         plt.imshow(final_img)
