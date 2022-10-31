@@ -16,7 +16,8 @@ def overlay_small_img_on_large_img_grid(small_img, large_img,
         plot: True to see the plot of the grid
 
     Returns:
-        The large image with a grid of n repetitions of a small image above it.
+        A copy of the large image with a grid of n repetitions of a small image
+         above it.
     """
     os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
@@ -36,6 +37,8 @@ def overlay_small_img_on_large_img_grid(small_img, large_img,
     row_idx = 0
     counter = 0
 
+    final_img = np.copy(large_img)
+
     for i in range(num_cells_in_grid):
         cell_start_h = row_idx * int(height_size_cell)
         cell_start_w = col_idx * int(width_size_cell)
@@ -46,10 +49,10 @@ def overlay_small_img_on_large_img_grid(small_img, large_img,
         alpha_s = backtorgb[:, :, 2] / 255.0
         alpha_l = 1.0 - alpha_s
 
-        for c in range(large_img.shape[-1]):
-            large_img[cell_start_h:cell_end_h, cell_start_w:cell_end_w, c] = \
+        for c in range(final_img.shape[-1]):
+            final_img[cell_start_h:cell_end_h, cell_start_w:cell_end_w, c] = \
                 (alpha_s * backtorgb[:, :, c] +
-                 alpha_l * large_img[cell_start_h:cell_end_h,
+                 alpha_l * final_img[cell_start_h:cell_end_h,
                                      cell_start_w:cell_end_w, c])
         counter += 1
         col_idx += 1
@@ -58,10 +61,10 @@ def overlay_small_img_on_large_img_grid(small_img, large_img,
             counter = 0
             col_idx = 0
 
-    large_img = cv.cvtColor(large_img, cv.COLOR_BGR2RGB)
-    large_img = np.array(large_img)
+    final_img = cv.cvtColor(final_img, cv.COLOR_BGR2RGB)
+    final_img = np.array(final_img)
     if plot:
-        plt.imshow(large_img)
+        plt.imshow(final_img)
         plt.show()
 
-    return large_img
+    return final_img

@@ -1,12 +1,19 @@
-from torchvision.datasets import MNIST
+from torchvision.datasets import MNIST, ImageNet
 import matplotlib.pyplot as plt
 import numpy as np
+import random
 
 
 def load_mnist():
     mnist_dataset_train = MNIST('../data/mnist/', download=True)
     mnist_dataset_test = MNIST('../data/mnist/', download=True, train=False)
     return mnist_dataset_train, mnist_dataset_test
+
+
+#def load_imagenet():
+#    imagenet_dataset_train = ImageNet('../data/imagenet/', download=True)
+#    imagenet_dataset_test = ImageNet('../data/imagenet/', download=True, train=False)
+#    return imagenet_dataset_train, imagenet_dataset_test
 
 
 def get_ith_img(dataset, idx, plot=False):
@@ -28,18 +35,23 @@ def get_ith_img(dataset, idx, plot=False):
     return img
 
 
-def sample_uniformly_img(dataset, seed):
+def sample_uniformly_imgs(dataset, num_samples, seed):
     """
-    Samples an image from dataset with discrete uniform probability.
+    Samples images (without duplicates) from dataset with discrete uniform
+    probability.
     Args:
         dataset: dataset
+        num_samples: number of images to sample
         seed: seed
 
     Returns:
-        The sampled image.
+        The sampled images.
     """
-    np.random.seed(seed)
-    num_samples_in_dataset = len(dataset)
-    sampled_idx = np.random.randint(0, num_samples_in_dataset)
-    sampled_img, _ = dataset[sampled_idx]
-    return np.asarray(sampled_img)
+    random.seed(seed)
+    sampled_imgs = []
+    sampled_idxs = random.sample(range(len(dataset)), num_samples)
+    
+    for idx in sampled_idxs:
+        img, _ = dataset[idx]
+        sampled_imgs.append(np.asarray(img))
+    return sampled_imgs
