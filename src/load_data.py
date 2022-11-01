@@ -35,19 +35,19 @@ def get_ith_img(dataset, idx, plot=False):
     return img
 
 
-def sample_uniformly_imgs(dataset, num_samples, seed):
+def sample_uniformly_imgs(dataset, num_samples): #, seed):
     """
     Samples images (without duplicates) from dataset with discrete uniform
     probability.
     Args:
         dataset: dataset
         num_samples: number of images to sample
-        seed: seed
+        #seed: seed
 
     Returns:
         The sampled images.
     """
-    random.seed(seed)
+    #random.seed(seed)
     sampled_imgs = []
     sampled_idxs = random.sample(range(len(dataset)), num_samples)
     
