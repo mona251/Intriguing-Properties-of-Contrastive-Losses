@@ -47,8 +47,13 @@ def downsample_img(original_img, new_height, new_width, grayscale):
 
 def crop_digit(img, plot=False):
     """
-    Given an image with a digit, it returns the smallest bounding box that
-    contains the digit.
+    Given an image with a black background, it returns the smallest bounding
+    box that contains the pixels that are both black and not black inside
+    the image img.
+    (For instance, given an image of a digit with a big portion of black
+    background, it returns the image of the digit inside the bounding box
+    that contains all the pixels of the digit and the smallest portion of
+    black pixels).
     Args:
         img: Image that contains the digit
         plot: True to show the image
@@ -71,3 +76,55 @@ def crop_digit(img, plot=False):
                         left_most_not_black_x:right_most_not_black_x + 1]
     if plot:
         plt.imshow(digit_cropped)
+        plt.show()
+
+    return digit_cropped
+
+
+def get_bottom_right_corner_to_match_shapes(shape_1, shape_2,
+                                            bottom_right_corner,
+                                            top_left_corner,
+                                            update_height):
+    """
+    Updates the bottom right corner coordinates such that shape_1 and shape_2
+    will have the same length.
+    Args:
+        shape_1: first shape
+        shape_2: second shape
+        bottom_right_corner: coordinates of the bottom right corner of a
+         bounding box
+        top_left_corner: coordinates of the top left corner of a
+         bounding box
+        update_height: True if shape_1 and shape_2 are heights, False if they
+         are widths
+
+    Returns:
+        The updated coordinates of the bottom right corner.
+    """
+    i = 0
+    while shape_1 < shape_2:
+        i += 1
+        if update_height:
+            bottom_right_corner = (bottom_right_corner[0] + i,
+                                   bottom_right_corner[1])
+            shape_1 = \
+                bottom_right_corner[0] - top_left_corner[0]
+        else:
+            bottom_right_corner = (bottom_right_corner[0],
+                                   bottom_right_corner[1] + i)
+            shape_1 = \
+                bottom_right_corner[1] - top_left_corner[1]
+    while shape_1 > shape_2:
+        i += 1
+        if update_height:
+            bottom_right_corner = (bottom_right_corner[0] - i,
+                                   bottom_right_corner[1])
+            shape_1 = \
+                bottom_right_corner[0] - top_left_corner[0]
+        else:
+            bottom_right_corner = (bottom_right_corner[0],
+                                   bottom_right_corner[1] - i)
+            shape_1 = \
+                bottom_right_corner[1] - top_left_corner[1]
+
+    return bottom_right_corner

@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from src.utils import downsample_img
+from src.utils import downsample_img, get_bottom_right_corner_to_match_shapes
 import os
 import cv2 as cv
 import random
@@ -144,35 +144,18 @@ def overlay_small_img_on_large_img_at_random_position(big_img, small_img):
     width_bb_small_img = \
         bottom_right_coord_small_img[1] - top_left_coord_small_img[1]
     if height_bb_small_img != small_img.shape[0]:
-        i = 0
-        while height_bb_small_img < small_img.shape[0]:
-            i += 1
-            bottom_right_coord_small_img = (bottom_right_coord_small_img[0] + i,
-                                            bottom_right_coord_small_img[1])
-            height_bb_small_img = \
-                bottom_right_coord_small_img[0] - top_left_coord_small_img[0]
-
-        while height_bb_small_img > small_img.shape[0]:
-            i += 1
-            bottom_right_coord_small_img = (bottom_right_coord_small_img[0] - i,
-                                            bottom_right_coord_small_img[1])
-            height_bb_small_img = \
-                bottom_right_coord_small_img[0] - top_left_coord_small_img[0]
+        bottom_right_coord_small_img = \
+            get_bottom_right_corner_to_match_shapes(height_bb_small_img, small_img.shape[0],
+                                                    bottom_right_coord_small_img,
+                                                    top_left_coord_small_img,
+                                                    update_height=True)
 
     if width_bb_small_img != small_img.shape[1]:
-        i = 0
-        while width_bb_small_img < small_img.shape[1]:
-            i += 1
-            bottom_right_coord_small_img = (bottom_right_coord_small_img[0],
-                                            bottom_right_coord_small_img[1] + i)
-            width_bb_small_img = \
-                bottom_right_coord_small_img[1] - top_left_coord_small_img[1]
-        while width_bb_small_img > small_img.shape[1]:
-            i += 1
-            bottom_right_coord_small_img = (bottom_right_coord_small_img[0],
-                                            bottom_right_coord_small_img[1] - i)
-            width_bb_small_img = \
-                bottom_right_coord_small_img[1] - top_left_coord_small_img[1]
+        bottom_right_coord_small_img = \
+            get_bottom_right_corner_to_match_shapes(width_bb_small_img, small_img.shape[1],
+                                                    bottom_right_coord_small_img,
+                                                    top_left_coord_small_img,
+                                                    update_height=False)
 
     big_img[top_left_coord_small_img[0]:bottom_right_coord_small_img[0],
             top_left_coord_small_img[1]:bottom_right_coord_small_img[1]] = small_img
