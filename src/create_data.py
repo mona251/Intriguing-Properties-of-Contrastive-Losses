@@ -24,9 +24,9 @@ def overlay_img(small_img, large_img, is_large_img_grayscale,
          inside large_img that will contain small_img
     """
     if is_large_img_grayscale:
-        large_img[bb_start_h:bb_end_h, bb_start_w:bb_end_w] = \
-            (small_img + large_img[bb_start_h:bb_end_h,
-                         bb_start_w:bb_end_w])
+        large_img[bb_start_h:bb_end_h, bb_start_w:bb_end_w] += \
+            (small_img + large_img[bb_start_h:bb_end_h, bb_start_w:bb_end_w])
+        large_img[large_img > 255] = 255
     else:
         small_img_rgb = cv.cvtColor(small_img, cv.COLOR_GRAY2RGB)
         alpha_s = small_img_rgb[:, :, 2] / 255.0
@@ -35,7 +35,7 @@ def overlay_img(small_img, large_img, is_large_img_grayscale,
             large_img[bb_start_h:bb_end_h, bb_start_w:bb_end_w, c] = \
                 (alpha_s * small_img_rgb[:, :, c] +
                  alpha_l * large_img[bb_start_h:bb_end_h,
-                           bb_start_w:bb_end_w, c])
+                 bb_start_w:bb_end_w, c])
 
 
 def overlay_small_img_on_large_img_grid(small_img, large_img,
@@ -158,4 +158,5 @@ def overlay_small_img_on_large_img_at_random_position(big_img, small_img):
                                                     update_height=False)
 
     big_img[top_left_coord_small_img[0]:bottom_right_coord_small_img[0],
-            top_left_coord_small_img[1]:bottom_right_coord_small_img[1]] = small_img
+            top_left_coord_small_img[1]:bottom_right_coord_small_img[1]] += small_img
+    big_img[big_img > 255] = 255
