@@ -98,8 +98,7 @@ def overlay_small_img_on_large_img_grid(small_img, large_img, num_cells_grid,
             else:
                 # Sample a new image from the dataset for each cell of the grid
                 # to fill
-                small_img = sample_uniformly_imgs(
-                    dataset, 1)[0]
+                small_img = sample_uniformly_imgs(dataset, 1)[0]
                 small_img = downsample_img(small_img, height_size_cell,
                                            width_size_cell, grayscale=True)
                 overlay_img(small_img, final_img, is_large_img_grayscale,
@@ -123,6 +122,7 @@ def overlay_small_img_on_large_img_grid(small_img, large_img, num_cells_grid,
 def overlay_small_img_on_large_img_at_random_position(large_img, small_img,
                                                       is_large_img_grayscale):
     """
+    Overlays a small_img on a large_img in a random position.
 
     Args:
         large_img: big image that will contain small_img
