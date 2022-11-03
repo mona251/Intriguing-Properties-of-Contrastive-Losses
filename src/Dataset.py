@@ -145,6 +145,18 @@ class Dataset(object):
     def generate_multi_digits_on_another_dataset_grid(
             self, other_dataset, n_images, n_repetition_digit_img,
             n_cells_in_grid=16):
+        """
+        Generates a dataset with images with multi digits placed on a
+        grid, on images of another dataset.
+        Args:
+            other_dataset: another dataset
+            n_images: number of images to generate
+            n_repetition_digit_img: number of digits for each image
+            n_cells_in_grid: number of cells of the grid
+
+        Returns:
+
+        """
         sampled_digit_images = sample_uniformly_imgs(
             self.mnist_dataset_train, n_images)
 
