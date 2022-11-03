@@ -1,4 +1,4 @@
-from torchvision.datasets import MNIST, ImageNet
+from torchvision.datasets import MNIST, CIFAR10
 import matplotlib.pyplot as plt
 import numpy as np
 import random
@@ -10,10 +10,10 @@ def load_mnist():
     return mnist_dataset_train, mnist_dataset_test
 
 
-#def load_imagenet():
-#    imagenet_dataset_train = ImageNet('../data/imagenet/', download=True)
-#    imagenet_dataset_test = ImageNet('../data/imagenet/', download=True, train=False)
-#    return imagenet_dataset_train, imagenet_dataset_test
+def load_cifar_10():
+    cifar10_dataset_train = CIFAR10('../data/cifar10/', download=True)
+    cifar10_dataset_test = CIFAR10('../data/cifar10/', download=True, train=False)
+    return cifar10_dataset_train, cifar10_dataset_test
 
 
 def get_ith_img(dataset, idx, plot=False):

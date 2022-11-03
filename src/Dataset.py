@@ -141,3 +141,28 @@ class Dataset(object):
             dataset.append(canvas)
 
         return dataset
+
+    def generate_multi_digits_on_another_dataset_grid(
+            self, other_dataset, n_images, n_repetition_digit_img,
+            n_cells_in_grid=16):
+        sampled_digit_images = sample_uniformly_imgs(
+            self.mnist_dataset_train, n_images)
+
+        sampled_other_dataset_images = \
+            sample_uniformly_imgs(other_dataset, n_images)
+
+        dataset = []
+
+        for i in range(n_images):
+            # TODO: what about the dim of the mnist img? Is it fine to just
+            #  downsample/upsample it to the dimension of a cell of a grid?
+            sampled_digit_img = sampled_digit_images[i]
+            sampled_other_dataset_img = sampled_other_dataset_images[i]
+
+            sampled_other_dataset_img = \
+                overlay_small_img_on_large_img_grid(
+                    sampled_digit_img, sampled_other_dataset_img,
+                    n_cells_in_grid, n_repetition_digit_img,
+                    is_large_img_grayscale=False, plot=False)
+            dataset.append(sampled_other_dataset_img)
+        return dataset
