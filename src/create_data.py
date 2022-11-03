@@ -37,6 +37,7 @@ def overlay_img(small_img, large_img, is_large_img_grayscale,
                 (alpha_s * small_img_rgb[:, :, c] +
                  alpha_l * large_img[bb_start_h:bb_end_h,
                  bb_start_w:bb_end_w, c])
+    return large_img
 
 
 def overlay_small_img_on_large_img_grid(small_img, large_img, num_cells_grid,
@@ -93,16 +94,18 @@ def overlay_small_img_on_large_img_grid(small_img, large_img, num_cells_grid,
             cell_end_h = (row_idx + 1) * int(height_size_cell)
             cell_end_w = (col_idx + 1) * int(width_size_cell)
             if repeat_small_img:
-                overlay_img(small_img, final_img, is_large_img_grayscale,
-                            cell_start_h, cell_end_h, cell_start_w, cell_end_w)
+                final_img = overlay_img(
+                    small_img, final_img, is_large_img_grayscale, cell_start_h,
+                    cell_end_h, cell_start_w, cell_end_w)
             else:
                 # Sample a new image from the dataset for each cell of the grid
                 # to fill
                 small_img = sample_uniformly_imgs(dataset, 1)[0]
                 small_img = downsample_img(small_img, height_size_cell,
                                            width_size_cell, grayscale=True)
-                overlay_img(small_img, final_img, is_large_img_grayscale,
-                            cell_start_h, cell_end_h, cell_start_w, cell_end_w)
+                final_img = overlay_img(
+                    small_img, final_img, is_large_img_grayscale, cell_start_h,
+                    cell_end_h, cell_start_w, cell_end_w)
         counter += 1
         col_idx += 1
         if counter % num_cells_one_row == 0:
@@ -169,6 +172,9 @@ def overlay_small_img_on_large_img_at_random_position(large_img, small_img,
                 width_bb_small_img, small_img.shape[1],
                 bottom_right_coord_small_img, top_left_coord_small_img,
                 update_height=False)
-    overlay_img(small_img, large_img, is_large_img_grayscale,
-                top_left_coord_small_img[0], bottom_right_coord_small_img[0],
-                top_left_coord_small_img[1], bottom_right_coord_small_img[1])
+    large_img = overlay_img(
+        small_img, large_img, is_large_img_grayscale,
+        top_left_coord_small_img[0], bottom_right_coord_small_img[0],
+        top_left_coord_small_img[1], bottom_right_coord_small_img[1])
+
+    return large_img
