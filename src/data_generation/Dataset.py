@@ -1,8 +1,8 @@
 import numpy as np
-from src.load_data import load_mnist, sample_uniformly_imgs
-from src.utils import crop_digit, downsample_img
-from src.create_data import overlay_small_img_on_large_img_at_random_position
-from src.create_data import overlay_small_img_on_large_img_grid
+from src.data_generation.load_data import load_mnist, sample_uniformly_imgs
+from src.data_generation.utils import crop_digit, downsample_img
+from src.data_generation.create_data import overlay_small_img_on_large_img_at_random_position
+from src.data_generation.create_data import overlay_small_img_on_large_img_grid
 
 
 class Dataset(object):
