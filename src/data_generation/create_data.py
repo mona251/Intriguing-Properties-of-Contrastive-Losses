@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from src.utils import downsample_img, get_bottom_right_corner_to_match_shapes
-from src.load_data import sample_uniformly_imgs
+from src.data_generation.utils import downsample_img, get_bottom_right_corner_to_match_shapes
+from src.data_generation.load_data import sample_uniformly_imgs
 import os
 import cv2 as cv
 import random
