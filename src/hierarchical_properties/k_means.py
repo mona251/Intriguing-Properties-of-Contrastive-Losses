@@ -3,6 +3,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+def get_colors_of_clusters(n_clusters):
+    blue = [0, 76, 153]
+    orange = [255, 178, 102]
+    red = [255, 102, 102]
+    light_blue = [102, 255, 255]
+    green = [0, 153, 76]
+    yellow = [255, 255, 153]
+    violet = [204, 153, 255]
+    pink = [255, 153, 153]
+    colors = [blue, orange, red, light_blue, green, yellow, violet, pink]
+    centers = []
+    for i in range(n_clusters):
+        centers.append(colors[i])
+    centers = np.uint8(centers)
+
+    return centers
+
+
 def k_means_on_img(image, k, max_iter=100, epsilon=0.2, attempts=10,
                    normalize=False, plot=False):
     flag = cv.KMEANS_RANDOM_CENTERS
@@ -35,6 +53,7 @@ def k_means_on_img(image, k, max_iter=100, epsilon=0.2, attempts=10,
         pixel_values, k, None, criteria, attempts, flag)
 
     # convert back to 8 bit values
+    centers = get_colors_of_clusters(n_clusters=k)
     centers = np.uint8(centers)
 
     # flatten the labels array
