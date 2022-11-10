@@ -6,6 +6,14 @@ from src.data_generation.utils import downsample_img
 
 
 def get_colors_of_clusters(n_clusters):
+    """
+    Gets the colors of each cluster for K-Means.
+    Args:
+        n_clusters: number of clusters
+
+    Returns:
+        The colors of each cluster for K-Means.
+    """
     blue = [0, 76, 153]
     orange = [255, 178, 102]
     red = [255, 102, 102]
@@ -25,6 +33,24 @@ def get_colors_of_clusters(n_clusters):
 
 def k_means_on_img(image, k, max_iter=100, epsilon=0.2, attempts=10,
                    normalize=False, plot=False):
+    """
+    Applies K-Means on an image.
+    Args:
+        image: image
+        k: number of clusters required at end
+        max_iter: max number of iterations after which K-Means will stop
+        epsilon: required accuracy
+        attempts:  Flag to specify the number of times the algorithm is
+         executed using different initial labellings. The algorithm
+         returns the labels that yield the best compactness.
+         This compactness is returned as output. See also:
+         https://docs.opencv.org/4.x/d1/d5c/tutorial_py_kmeans_opencv.html
+        normalize: True if the image does not have values between 0 and 255
+        plot: True to show the segmented image
+
+    Returns:
+        The image segmented with K-Means.
+    """
     flag = cv.KMEANS_RANDOM_CENTERS
     criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, max_iter,
                 epsilon)
@@ -79,6 +105,40 @@ def k_means_img_patch(img, patch_size, k, max_iter, epsilon, attempts,
                       normalize, weight_original_img=0.4,
                       weight_colored_patch=0.4, gamma=0,
                       compute_also_nn_interpolation=True):
+    """
+    Steps:
+     - Applies K-Means on a patch of img and upscale the result to the shape
+       of img with bilinear interpolation
+     - It then overlays the upscaled result of K-Means to the original image
+       img
+     - It can also do the first two steps using nearest neighbor interpolation
+       if compute_also_nn_interpolation is True
+    Args:
+        img: original image
+        patch_size: size of the patch of the image
+        k: number of clusters required at end
+        max_iter: max number of iterations after which K-Means will stop
+        epsilon: required accuracy
+        attempts:  Flag to specify the number of times the algorithm is
+         executed using different initial labellings. The algorithm
+         returns the labels that yield the best compactness.
+         This compactness is returned as output. See also:
+         https://docs.opencv.org/4.x/d1/d5c/tutorial_py_kmeans_opencv.html
+        normalize: True if the image does not have values between 0 and 255
+        weight_original_img: see
+         https://docs.opencv.org/3.4/d2/de8/group__core__array.html#gafafb2513349db3bcff51f54ee5592a19
+        weight_colored_patch: see
+         https://docs.opencv.org/3.4/d2/de8/group__core__array.html#gafafb2513349db3bcff51f54ee5592a19
+        gamma: see
+         https://docs.opencv.org/3.4/d2/de8/group__core__array.html#gafafb2513349db3bcff51f54ee5592a19
+        compute_also_nn_interpolation: True to apply the described steps
+         also using nearest neighbor interpolation
+
+    Returns:
+        The segmented patch of image img with K-Means upscaled with bilinear
+        interpolation, and optionally also the segmented patch of image img
+        with K-Means upscaled with nearest neighbor interpolation
+    """
     full_size = img.shape[0]
 
     patch = downsample_img(img, patch_size, patch_size, False)
@@ -111,4 +171,3 @@ def k_means_img_patch(img, patch_size, k, max_iter, epsilon, attempts,
             weight_colored_patch, gamma)
 
     return final_img_bilinear_interp, final_img_nn_interp
-
