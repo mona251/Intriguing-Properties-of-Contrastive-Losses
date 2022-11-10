@@ -20,13 +20,15 @@ def get_height_width_ratio(old_height, old_width, new_height, new_width):
     return height_ratio, width_ratio
 
 
-def downsample_img(original_img, new_height, new_width, grayscale):
+def downsample_img(original_img, new_height, new_width, grayscale,
+                   interpolation_method=cv.INTER_LINEAR):
     """Downsamples an image.
     Args:
         original_img (numpy.array): original image
         new_height (int): height that the image will have
         new_width (int): width that the image will have
         grayscale (bool): True if original_img is a grayscale image
+        interpolation_method: interpolation method
     Returns:
         numpy.array: downsampled image.
     """
@@ -41,7 +43,7 @@ def downsample_img(original_img, new_height, new_width, grayscale):
                                 (0, 0),  # set fx and fy, not the final size
                                 fx=width_ratio,
                                 fy=height_ratio,
-                                interpolation=cv.INTER_LINEAR)
+                                interpolation=interpolation_method)
     return downsampled_img
 
 
