@@ -2,6 +2,8 @@ import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 
+from src.data_generation.utils import downsample_img
+
 
 def get_colors_of_clusters(n_clusters):
     blue = [0, 76, 153]
@@ -49,10 +51,11 @@ def k_means_on_img(image, k, max_iter=100, epsilon=0.2, attempts=10,
     # some documentation:
     # https://docs.opencv.org/4.x/d1/d5c/tutorial_py_kmeans_opencv.html
     attempts = attempts
-    _, labels, (centers) = cv.kmeans(
+    _, labels, _ = cv.kmeans(
         pixel_values, k, None, criteria, attempts, flag)
 
     # convert back to 8 bit values
+
     centers = get_colors_of_clusters(n_clusters=k)
     centers = np.uint8(centers)
 
@@ -70,3 +73,42 @@ def k_means_on_img(image, k, max_iter=100, epsilon=0.2, attempts=10,
         plt.show()
 
     return segmented_image
+
+
+def k_means_img_patch(img, patch_size, k, max_iter, epsilon, attempts,
+                      normalize, weight_original_img=0.4,
+                      weight_colored_patch=0.4, gamma=0,
+                      compute_also_nn_interpolation=True):
+    full_size = img.shape[0]
+
+    patch = downsample_img(img, patch_size, patch_size, False)
+    seg_patch = k_means_on_img(
+        patch, k=k, max_iter=max_iter, epsilon=epsilon, attempts=attempts,
+        normalize=normalize, plot=False)
+
+    seg_full_bilinear_interp = downsample_img(
+        seg_patch, full_size, full_size, False,
+        interpolation_method=cv.INTER_LINEAR)
+
+    # Convert the original image as grayscale image to put it in the background
+    # to be able to put the patch (the output of Kmeans) over it in a
+    # transparent way.
+    # Single channel grayscale image
+    img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    # Repeat the grayscale image along all the 3 channels
+    stacked_img = np.stack((img_gray,) * 3, axis=-1)
+
+    final_img_bilinear_interp = cv.addWeighted(
+        stacked_img, weight_original_img, seg_full_bilinear_interp,
+        weight_colored_patch, gamma)
+
+    final_img_nn_interp = None
+    if compute_also_nn_interpolation:
+        seg_full_nn_interp = downsample_img(seg_patch, full_size, full_size, False,
+                                            interpolation_method=cv.INTER_NEAREST)
+        final_img_nn_interp = cv.addWeighted(
+            stacked_img, weight_original_img, seg_full_nn_interp,
+            weight_colored_patch, gamma)
+
+    return final_img_bilinear_interp, final_img_nn_interp
+
