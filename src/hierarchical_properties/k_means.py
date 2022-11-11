@@ -32,7 +32,7 @@ def get_colors_of_clusters(n_clusters):
 
 
 def k_means_on_img(image, k, max_iter=100, epsilon=0.2, attempts=10,
-                   normalize=False, plot=False):
+                   normalize=False, n_channels=3, plot=False):
     """
     Applies K-Means on an image.
     Args:
@@ -46,6 +46,8 @@ def k_means_on_img(image, k, max_iter=100, epsilon=0.2, attempts=10,
          This compactness is returned as output. See also:
          https://docs.opencv.org/4.x/d1/d5c/tutorial_py_kmeans_opencv.html
         normalize: True if the image does not have values between 0 and 255
+        n_channels: number of dimensions of the vector on which to apply
+         K-Means
         plot: True to show the segmented image
 
     Returns:
@@ -54,8 +56,8 @@ def k_means_on_img(image, k, max_iter=100, epsilon=0.2, attempts=10,
     flag = cv.KMEANS_RANDOM_CENTERS
     criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, max_iter,
                 epsilon)
-
-    image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+    if n_channels == 3:
+        image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
     if plot:
         # show the image
         plt.imshow(image)
@@ -69,7 +71,7 @@ def k_means_on_img(image, k, max_iter=100, epsilon=0.2, attempts=10,
         image = norm_image.astype(np.uint8)
 
     # reshape the image to a 2D array of pixels and 3 color values (RGB)
-    pixel_values = image.reshape((-1, 3))
+    pixel_values = image.reshape((-1, n_channels))
     # convert to float
     pixel_values = np.float32(pixel_values)
 
@@ -92,7 +94,8 @@ def k_means_on_img(image, k, max_iter=100, epsilon=0.2, attempts=10,
     segmented_image = centers[labels.flatten()]
 
     # reshape back to the original image dimension
-    segmented_image = segmented_image.reshape(image.shape)
+    segmented_image = segmented_image.reshape(
+        image.shape[0], image.shape[1], 3)
     if plot:
         # show the image
         plt.imshow(segmented_image)
@@ -104,6 +107,7 @@ def k_means_on_img(image, k, max_iter=100, epsilon=0.2, attempts=10,
 def k_means_img_patch_rgb_raw(img, patch_size, k, max_iter, epsilon, attempts,
                               normalize, weight_original_img=0.4,
                               weight_colored_patch=0.4, gamma=0,
+                              n_channels=3,
                               compute_also_nn_interpolation=True):
     """
     Steps:
@@ -131,6 +135,8 @@ def k_means_img_patch_rgb_raw(img, patch_size, k, max_iter, epsilon, attempts,
          https://docs.opencv.org/3.4/d2/de8/group__core__array.html#gafafb2513349db3bcff51f54ee5592a19
         gamma: see
          https://docs.opencv.org/3.4/d2/de8/group__core__array.html#gafafb2513349db3bcff51f54ee5592a19
+        n_channels = number of dimensions of the vector on which to apply
+         K-Means
         compute_also_nn_interpolation: True to apply the described steps
          also using nearest neighbor interpolation
 
@@ -144,7 +150,7 @@ def k_means_img_patch_rgb_raw(img, patch_size, k, max_iter, epsilon, attempts,
     patch = downsample_img(img, patch_size, patch_size, False)
     seg_patch = k_means_on_img(
         patch, k=k, max_iter=max_iter, epsilon=epsilon, attempts=attempts,
-        normalize=normalize, plot=False)
+        normalize=normalize, n_channels=n_channels, plot=False)
 
     seg_full_bilinear_interp = downsample_img(
         seg_patch, full_size, full_size, False,
