@@ -101,10 +101,10 @@ def k_means_on_img(image, k, max_iter=100, epsilon=0.2, attempts=10,
     return segmented_image
 
 
-def k_means_img_patch(img, patch_size, k, max_iter, epsilon, attempts,
-                      normalize, weight_original_img=0.4,
-                      weight_colored_patch=0.4, gamma=0,
-                      compute_also_nn_interpolation=True):
+def k_means_img_patch_rgb_raw(img, patch_size, k, max_iter, epsilon, attempts,
+                              normalize, weight_original_img=0.4,
+                              weight_colored_patch=0.4, gamma=0,
+                              compute_also_nn_interpolation=True):
     """
     Steps:
      - Applies K-Means on a patch of img and upscale the result to the shape
