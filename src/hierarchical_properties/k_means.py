@@ -22,7 +22,10 @@ def get_colors_of_clusters(n_clusters):
     yellow = [255, 255, 153]
     violet = [204, 153, 255]
     pink = [255, 153, 153]
-    colors = [blue, orange, red, light_blue, green, yellow, violet, pink]
+    black = [0, 0, 0]
+    white = [255, 255, 255]
+    colors = [blue, orange, red, light_blue, green, yellow, violet, pink,
+              black, white]
     centers = []
     for i in range(n_clusters):
         centers.append(colors[i])
