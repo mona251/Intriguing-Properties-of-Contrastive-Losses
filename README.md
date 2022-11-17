@@ -2,6 +2,8 @@
 
 Pre-trained simCLR: https://github.com/Spijkervet/SimCLR
 
+Download imagenette here (click Full Size download): https://github.com/fastai/imagenette
+
 Experimental setup:
 
 ResNet-50 with 2-layer projection head after the ResNet's average pooling layer.
