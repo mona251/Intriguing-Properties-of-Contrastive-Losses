@@ -1,7 +1,7 @@
 # DD2412project
 
 
-[![Open in Colab] (https://colab.research.google.com/assets/colab-badge.svg)] (https://colab.research.google.com/github/mona251/DD2412project/blob/main/simclr.ipynb)
+[[Open in Colab] (https://colab.research.google.com/assets/colab-badge.svg)] (https://colab.research.google.com/github/mona251/DD2412project/blob/main/simclr.ipynb)
 
 Pre-trained simCLR: https://github.com/Spijkervet/SimCLR
 
