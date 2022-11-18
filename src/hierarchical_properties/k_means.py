@@ -22,7 +22,10 @@ def get_colors_of_clusters(n_clusters):
     yellow = [255, 255, 153]
     violet = [204, 153, 255]
     pink = [255, 153, 153]
-    colors = [blue, orange, red, light_blue, green, yellow, violet, pink]
+    black = [0, 0, 0]
+    white = [255, 255, 255]
+    colors = [blue, orange, red, light_blue, green, yellow, violet, pink,
+              black, white]
     centers = []
     for i in range(n_clusters):
         centers.append(colors[i])
@@ -53,7 +56,7 @@ def k_means_on_img(image, k, max_iter=100, epsilon=0.2, attempts=10,
     Returns:
         The image segmented with K-Means.
     """
-    flag = cv.KMEANS_RANDOM_CENTERS
+    flag = cv.KMEANS_PP_CENTERS
     criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, max_iter,
                 epsilon)
     if n_channels == 3:
@@ -79,11 +82,10 @@ def k_means_on_img(image, k, max_iter=100, epsilon=0.2, attempts=10,
     # some documentation:
     # https://docs.opencv.org/4.x/d1/d5c/tutorial_py_kmeans_opencv.html
     attempts = attempts
-    _, labels, _ = cv.kmeans(
+    compactness, labels, _ = cv.kmeans(
         pixel_values, k, None, criteria, attempts, flag)
 
     # convert back to 8 bit values
-
     centers = get_colors_of_clusters(n_clusters=k)
     centers = np.uint8(centers)
 
@@ -101,7 +103,7 @@ def k_means_on_img(image, k, max_iter=100, epsilon=0.2, attempts=10,
         plt.imshow(segmented_image)
         plt.show()
 
-    return segmented_image
+    return segmented_image, compactness
 
 
 def k_means_img_patch_rgb_raw(img, patch_size, k, max_iter, epsilon, attempts,
@@ -148,7 +150,7 @@ def k_means_img_patch_rgb_raw(img, patch_size, k, max_iter, epsilon, attempts,
     full_size = img.shape[0]
 
     patch = downsample_img(img, patch_size, patch_size, False)
-    seg_patch = k_means_on_img(
+    seg_patch, _ = k_means_on_img(
         patch, k=k, max_iter=max_iter, epsilon=epsilon, attempts=attempts,
         normalize=normalize, n_channels=n_channels, plot=False)
 
