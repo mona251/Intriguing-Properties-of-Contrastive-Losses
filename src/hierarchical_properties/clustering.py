@@ -36,6 +36,18 @@ def get_colors_of_clusters(n_clusters):
 
 
 def get_segmented_img(feature, centers, labels, plot=False):
+    """
+    Gets the segmented image of feature, given the centers and labels retrieved
+    by a clustering algorithm.
+    Args:
+        feature: feature on which the clustering method was applied on
+        centers: centers of the clusters
+        labels: labels of the pixels
+        plot: True to plot the segmented image
+
+    Returns:
+        The segmented image.
+    """
     n_rgb_channels = 3
     # convert all pixels to the color of the centroids
     segmented_image = centers[labels.flatten()]
