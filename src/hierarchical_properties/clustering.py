@@ -1,8 +1,9 @@
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans, AgglomerativeClustering
 
-from src.data_generation.utils import downsample_img
+from src.data_generation.utils import downsample_img, normalize_img
 
 
 def get_colors_of_clusters(n_clusters):
@@ -34,13 +35,30 @@ def get_colors_of_clusters(n_clusters):
     return centers
 
 
-def k_means_on_img(image, k, max_iter=100, epsilon=0.2, attempts=10,
-                   normalize=False, n_channels=3, plot=False):
+def get_segmented_img(feature, centers, labels, plot=False):
+    n_rgb_channels = 3
+    # convert all pixels to the color of the centroids
+    segmented_image = centers[labels.flatten()]
+
+    # reshape back to RGB image dimension
+    segmented_image = segmented_image.reshape(
+        feature.shape[0], feature.shape[1], n_rgb_channels)
+    if plot:
+        # show the image
+        plt.imshow(segmented_image)
+        plt.show()
+
+    return segmented_image
+
+
+def k_means_on_feature(feature, n_clusters, max_iter=100, epsilon=0.2,
+                       attempts=10, normalize=False, n_channels=3, plot=False):
     """
-    Applies K-Means on an image.
+    Applies K-Means on a feature extracted by a neural network.
     Args:
-        image: image
-        k: number of clusters required at end
+        feature: feature extracted by a neural network
+        n_clusters: The number of clusters to form as well as the number
+         of centroids to generate
         max_iter: max number of iterations after which K-Means will stop
         epsilon: required accuracy
         attempts:  Flag to specify the number of times the algorithm is
@@ -56,54 +74,83 @@ def k_means_on_img(image, k, max_iter=100, epsilon=0.2, attempts=10,
     Returns:
         The image segmented with K-Means.
     """
-    flag = cv.KMEANS_PP_CENTERS
-    criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, max_iter,
-                epsilon)
-    if n_channels == 3:
-        image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
     if plot:
         # show the image
-        plt.imshow(image)
+        plt.imshow(feature)
         plt.show()
 
     if normalize:
-        # normalize img to 0-255
-        norm_image = cv.normalize(image, None, alpha=0, beta=255,
-                                  norm_type=cv.NORM_MINMAX, dtype=cv.CV_32F)
-
-        image = norm_image.astype(np.uint8)
+        min_value = 0
+        max_value = 255
+        feature = normalize_img(feature, min_value, max_value,
+                                return_int_values=True)
 
     # reshape the image to a 2D array of pixels and 3 color values (RGB)
-    pixel_values = image.reshape((-1, n_channels))
+    pixel_values = feature.reshape((-1, n_channels))
     # convert to float
     pixel_values = np.float32(pixel_values)
 
-    k = k
-    # some documentation:
-    # https://docs.opencv.org/4.x/d1/d5c/tutorial_py_kmeans_opencv.html
-    attempts = attempts
-    compactness, labels, _ = cv.kmeans(
-        pixel_values, k, None, criteria, attempts, flag)
+    kmeans = KMeans(n_clusters=n_clusters, n_init=attempts,
+                    max_iter=max_iter, tol=epsilon).fit(pixel_values)
 
     # convert back to 8 bit values
-    centers = get_colors_of_clusters(n_clusters=k)
-    centers = np.uint8(centers)
+    centers = get_colors_of_clusters(n_clusters=n_clusters)
 
-    # flatten the labels array
-    labels = labels.flatten()
+    # get the labels array
+    labels = kmeans.labels_
 
-    # convert all pixels to the color of the centroids
-    segmented_image = centers[labels.flatten()]
-
-    # reshape back to the original image dimension
-    segmented_image = segmented_image.reshape(
-        image.shape[0], image.shape[1], 3)
-    if plot:
-        # show the image
-        plt.imshow(segmented_image)
-        plt.show()
+    segmented_image = get_segmented_img(feature, centers, labels, plot=plot)
+    # Sum of squared distances of samples to their closest cluster center,
+    # weighted by the sample weights if provided.
+    compactness = kmeans.inertia_
 
     return segmented_image, compactness
+
+
+def ward_on_feature(feature, n_clusters, normalize=False, n_channels=3,
+                    plot=False):
+    """
+    Applies Ward's Hierarchical Clustering on a feature extracted by a neural
+    network.
+    Args:
+        feature: feature extracted by a neural network
+        n_clusters: The number of clusters to form as well as the number
+         of centroids to generate
+        normalize: True if the image does not have values between 0 and 255
+        n_channels: number of dimensions of the vector on which to apply
+         Ward's Hierarchical Clustering
+        plot: True to show the segmented image
+
+    Returns:
+        The image segmented with Ward's Hierarchical Clustering.
+    """
+    if plot:
+        # show the image
+        plt.imshow(feature)
+        plt.show()
+
+    if normalize:
+        min_value = 0
+        max_value = 255
+        feature = normalize_img(feature, min_value, max_value,
+                                return_int_values=True)
+
+    # reshape the image to a 2D array of pixels and 3 color values (RGB)
+    pixel_values = feature.reshape((-1, n_channels))
+    # convert to float
+    pixel_values = np.float32(pixel_values)
+
+    agg_ward = AgglomerativeClustering(
+        n_clusters=n_clusters, linkage='ward').fit(pixel_values)
+
+    # convert back to 8 bit values
+    centers = get_colors_of_clusters(n_clusters=n_clusters)
+
+    # get the labels array
+    labels = agg_ward.labels_
+
+    segmented_image = get_segmented_img(feature, centers, labels, plot=plot)
+    return segmented_image
 
 
 def k_means_img_patch_rgb_raw(img, patch_size, k, max_iter, epsilon, attempts,
@@ -139,6 +186,8 @@ def k_means_img_patch_rgb_raw(img, patch_size, k, max_iter, epsilon, attempts,
          https://docs.opencv.org/3.4/d2/de8/group__core__array.html#gafafb2513349db3bcff51f54ee5592a19
         n_channels = number of dimensions of the vector on which to apply
          K-Means
+        n_channels: number of dimensions of the vector on which to apply
+         K-Means
         compute_also_nn_interpolation: True to apply the described steps
          also using nearest neighbor interpolation
 
@@ -150,8 +199,8 @@ def k_means_img_patch_rgb_raw(img, patch_size, k, max_iter, epsilon, attempts,
     full_size = img.shape[0]
 
     patch = downsample_img(img, patch_size, patch_size, False)
-    seg_patch, _ = k_means_on_img(
-        patch, k=k, max_iter=max_iter, epsilon=epsilon, attempts=attempts,
+    seg_patch, _ = k_means_on_feature(
+        patch, n_clusters=k, max_iter=max_iter, epsilon=epsilon, attempts=attempts,
         normalize=normalize, n_channels=n_channels, plot=False)
 
     seg_full_bilinear_interp = downsample_img(

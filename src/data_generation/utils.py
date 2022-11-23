@@ -130,3 +130,27 @@ def get_bottom_right_corner_to_match_shapes(shape_1, shape_2,
                 bottom_right_corner[1] - top_left_corner[1]
 
     return bottom_right_corner
+
+
+def normalize_img(img, min_value, max_value, return_int_values=False):
+    """
+    Normalizes an image by changing its pixels' values range into [min_value,
+    max_value].
+    Args:
+        img: image
+        min_value: minimum value of the range of values pixels will be scaled
+         to
+        max_value: maximum value of the range of values pixels will be scaled
+         to
+        return_int_values: True if the normalized values should be integers
+
+    Returns:
+        The normalized image.
+    """
+    norm_image = cv.normalize(img, None, alpha=min_value, beta=max_value,
+                              norm_type=cv.NORM_MINMAX, dtype=cv.CV_32F)
+    if return_int_values:
+        # To use for example when normalizing an image between 0 and 255.
+        # Not to use when normalizing an image between [0, 1(.
+        norm_image = norm_image.astype(np.uint8)
+    return norm_image
