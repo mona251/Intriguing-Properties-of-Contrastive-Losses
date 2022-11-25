@@ -101,7 +101,6 @@ def k_means_on_feature(feature: np.ndarray, n_clusters: int, max_iter=100,
 
     # reshape the image to a 2D array of pixels and 3 color values (RGB)
     pixel_values = feature.reshape((-1, n_channels))
-    #print(pixel_values.shape)
     # convert to float
     pixel_values = np.float32(pixel_values)
 
@@ -113,7 +112,6 @@ def k_means_on_feature(feature: np.ndarray, n_clusters: int, max_iter=100,
 
     # get the labels array
     labels = kmeans.labels_
-    #print(labels.shape)
 
     segmented_image = get_segmented_img(feature, centers, labels, plot=plot)
     # Sum of squared distances of samples to their closest cluster center,
@@ -153,7 +151,6 @@ def ward_on_feature(feature: np.ndarray, n_clusters: np.ndarray,
 
     # reshape the image to a 2D array of pixels and 3 color values (RGB)
     pixel_values = feature.reshape((-1, n_channels))
-    print(pixel_values.shape)
     # convert to float
     pixel_values = np.float32(pixel_values)
 
