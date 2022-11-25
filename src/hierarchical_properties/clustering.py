@@ -6,7 +6,7 @@ from sklearn.cluster import KMeans, AgglomerativeClustering
 from src.data_generation.utils import downsample_img, normalize_img
 
 
-def get_colors_of_clusters(n_clusters):
+def get_colors_of_clusters(n_clusters: int) -> np.ndarray:
     """
     Gets the colors of each cluster for K-Means.
     Args:
@@ -35,7 +35,8 @@ def get_colors_of_clusters(n_clusters):
     return centers
 
 
-def get_segmented_img(feature, centers, labels, plot=False):
+def get_segmented_img(feature: np.ndarray, centers: np.ndarray,
+                      labels: np.ndarray, plot=False) -> np.ndarray:
     """
     Gets the segmented image of feature, given the centers and labels retrieved
     by a clustering algorithm.
@@ -63,8 +64,9 @@ def get_segmented_img(feature, centers, labels, plot=False):
     return segmented_image
 
 
-def k_means_on_feature(feature, n_clusters, max_iter=100, epsilon=0.2,
-                       attempts=10, normalize=False, n_channels=3, plot=False):
+def k_means_on_feature(feature: np.ndarray, n_clusters: int, max_iter=100,
+                       epsilon=0.2, attempts=10, normalize=False, n_channels=3,
+                       plot=False) -> (np.ndarray, float):
     """
     Applies K-Means on a feature extracted by a neural network.
     Args:
@@ -119,8 +121,8 @@ def k_means_on_feature(feature, n_clusters, max_iter=100, epsilon=0.2,
     return segmented_image, compactness
 
 
-def ward_on_feature(feature, n_clusters, normalize=False, n_channels=3,
-                    plot=False):
+def ward_on_feature(feature: np.ndarray, n_clusters: np.ndarray,
+                    normalize=False, n_channels=3, plot=False) -> np.ndarray:
     """
     Applies Ward's Hierarchical Clustering on a feature extracted by a neural
     network.
@@ -165,11 +167,13 @@ def ward_on_feature(feature, n_clusters, normalize=False, n_channels=3,
     return segmented_image
 
 
-def k_means_img_patch_rgb_raw(img, patch_size, k, max_iter, epsilon, attempts,
-                              normalize, weight_original_img=0.4,
+def k_means_img_patch_rgb_raw(img: np.ndarray, patch_size: int, k: int,
+                              max_iter: int, epsilon: float, attempts: int,
+                              normalize: bool, weight_original_img=0.4,
                               weight_colored_patch=0.4, gamma=0,
                               n_channels=3,
-                              compute_also_nn_interpolation=True):
+                              compute_also_nn_interpolation=True) \
+        -> (np.ndarray, np.ndarray):
     """
     Steps:
      - Applies K-Means on a patch of img and upscale the result to the shape

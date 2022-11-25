@@ -7,8 +7,10 @@ import cv2 as cv
 import random
 
 
-def overlay_img(small_img, large_img, is_large_img_grayscale,
-                bb_start_h, bb_end_h, bb_start_w, bb_end_w):
+def overlay_img(small_img: np.ndarray, large_img: np.ndarray,
+                is_large_img_grayscale: bool,
+                bb_start_h: int, bb_end_h: int, bb_start_w: int,
+                bb_end_w: int) -> np.ndarray:
     """
     Overlays a small_img on a large_img at a specified bounding box.
     Args:
@@ -40,11 +42,13 @@ def overlay_img(small_img, large_img, is_large_img_grayscale,
     return large_img
 
 
-def overlay_small_img_on_large_img_grid(small_img, large_img, num_cells_grid,
-                                        n_repetitions_small_img,
-                                        is_large_img_grayscale,
+def overlay_small_img_on_large_img_grid(small_img: np.ndarray,
+                                        large_img: np.ndarray,
+                                        num_cells_grid: int,
+                                        n_repetitions_small_img: int,
+                                        is_large_img_grayscale: bool,
                                         repeat_small_img=True, dataset=None,
-                                        plot=False):
+                                        plot=False) -> np.ndarray:
     """
     Returns a grid of n repetitions of a small image above a large_img.
     Args:
@@ -122,8 +126,9 @@ def overlay_small_img_on_large_img_grid(small_img, large_img, num_cells_grid,
     return final_img
 
 
-def overlay_small_img_on_large_img_at_random_position(large_img, small_img,
-                                                      is_large_img_grayscale):
+def overlay_small_img_on_large_img_at_random_position(
+        large_img: np.ndarray, small_img: np.ndarray,
+        is_large_img_grayscale: bool) -> np.ndarray:
     """
     Overlays a small_img on a large_img in a random position.
 

@@ -3,7 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def get_height_width_ratio(old_height, old_width, new_height, new_width):
+def get_height_width_ratio(old_height: int, old_width: int, new_height: int,
+                           new_width: int) -> (float, float):
     """Returns the two ratios:
       - new height / old height
       - new witdh / old witdh
@@ -20,8 +21,9 @@ def get_height_width_ratio(old_height, old_width, new_height, new_width):
     return height_ratio, width_ratio
 
 
-def downsample_img(original_img, new_height, new_width, grayscale,
-                   interpolation_method=cv.INTER_LINEAR):
+def downsample_img(original_img: np.ndarray, new_height: int, new_width: int,
+                   grayscale: bool, interpolation_method=cv.INTER_LINEAR) \
+        -> np.ndarray:
     """Downsamples an image.
     Args:
         original_img (numpy.array): original image
@@ -47,7 +49,7 @@ def downsample_img(original_img, new_height, new_width, grayscale,
     return downsampled_img
 
 
-def crop_digit(img, plot=False):
+def crop_digit(img: np.ndarray, plot=False) -> np.ndarray:
     """
     Given an image with a black background, it returns the smallest bounding
     box that contains the pixels that are both black and not black inside
@@ -83,10 +85,10 @@ def crop_digit(img, plot=False):
     return digit_cropped
 
 
-def get_bottom_right_corner_to_match_shapes(shape_1, shape_2,
-                                            bottom_right_corner,
-                                            top_left_corner,
-                                            update_height):
+def get_bottom_right_corner_to_match_shapes(shape_1: int, shape_2: int,
+                                            bottom_right_corner: (int, int),
+                                            top_left_corner: (int, int),
+                                            update_height: bool) -> (int, int):
     """
     Updates the bottom right corner coordinates such that shape_1 and shape_2
     will have the same length.
@@ -132,7 +134,8 @@ def get_bottom_right_corner_to_match_shapes(shape_1, shape_2,
     return bottom_right_corner
 
 
-def normalize_img(img, min_value, max_value, return_int_values=False):
+def normalize_img(img: np.ndarray, min_value: int, max_value: int,
+                  return_int_values=False) -> np.ndarray:
     """
     Normalizes an image by changing its pixels' values range into [min_value,
     max_value].

@@ -1,4 +1,6 @@
 import numpy as np
+import torchvision.datasets as tds
+
 from src.data_generation.load_data import load_mnist, sample_uniformly_imgs
 from src.data_generation.utils import crop_digit, downsample_img
 from src.data_generation.create_data import overlay_small_img_on_large_img_at_random_position
@@ -9,8 +11,9 @@ class Dataset(object):
     def __init__(self):
         self.mnist_dataset_train, _ = load_mnist()
 
-    def generate_multi_digits_randomly_placed(self, n_images, n_digits_in_img,
-                                              img_shape=(112, 112)):
+    def generate_multi_digits_randomly_placed(
+            self, n_images: int, n_digits_in_img: int, img_shape=(112, 112)) \
+            -> list:
         """
         Generates a dataset with images with multi digits randomly placed on
         black images.
@@ -47,9 +50,10 @@ class Dataset(object):
 
         return dataset
 
-    def generate_multi_digits_grid(self, n_images, n_repetition_digit_img,
-                                   n_cells_in_grid=16, img_shape=(112, 112),
-                                   repeat_same_digit=False):
+    def generate_multi_digits_grid(
+            self, n_images: int, n_repetition_digit_img: int,
+            n_cells_in_grid=16, img_shape=(112, 112),
+            repeat_same_digit=False) -> list:
         """
         Generates a dataset with images with multi digits placed on a
         grid.
@@ -91,7 +95,8 @@ class Dataset(object):
         return dataset
 
     def generate_two_digits_varying_size_randomly_placed(
-            self, n_images, img_shape=(112, 112), min_size=20, max_size=80):
+            self, n_images: int, img_shape=(112, 112), min_size=20,
+            max_size=80) -> list:
         """
         Generates a dataset with images with two digits randomly placed on
         black images.
@@ -143,8 +148,8 @@ class Dataset(object):
         return dataset
 
     def generate_multi_digits_on_another_dataset_grid(
-            self, other_dataset, n_images, n_repetition_digit_img,
-            n_cells_in_grid=16):
+            self, other_dataset: tds, n_images: int,
+            n_repetition_digit_img: int, n_cells_in_grid=16) -> list:
         """
         Generates a dataset with images with multi digits placed on a
         grid, on images of another dataset.
