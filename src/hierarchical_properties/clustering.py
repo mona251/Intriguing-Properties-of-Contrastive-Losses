@@ -36,7 +36,8 @@ def get_colors_of_clusters(n_clusters: int) -> np.ndarray:
 
 
 def get_segmented_img(feature: np.ndarray, centers: np.ndarray,
-                      labels: np.ndarray, plot=False) -> np.ndarray:
+                      labels: np.ndarray, batch=False, plot=False) \
+        -> np.ndarray:
     """
     Gets the segmented image of feature, given the centers and labels retrieved
     by a clustering algorithm.
@@ -44,6 +45,7 @@ def get_segmented_img(feature: np.ndarray, centers: np.ndarray,
         feature: feature on which the clustering method was applied on
         centers: centers of the clusters
         labels: labels of the pixels
+        batch: True if batch of features
         plot: True to plot the segmented image
 
     Returns:
@@ -54,8 +56,13 @@ def get_segmented_img(feature: np.ndarray, centers: np.ndarray,
     segmented_image = centers[labels.flatten()]
 
     # reshape back to RGB image dimension
-    segmented_image = segmented_image.reshape(
-        feature.shape[0], feature.shape[1], n_rgb_channels)
+    if batch:
+        segmented_image = segmented_image.reshape(
+            feature.shape[0], feature.shape[1], feature.shape[2],
+            n_rgb_channels)
+    else:
+        segmented_image = segmented_image.reshape(
+            feature.shape[0], feature.shape[1], n_rgb_channels)
     if plot:
         # show the image
         plt.imshow(segmented_image)
@@ -66,7 +73,7 @@ def get_segmented_img(feature: np.ndarray, centers: np.ndarray,
 
 def k_means_on_feature(feature: np.ndarray, n_clusters: int, max_iter=100,
                        epsilon=0.2, attempts=10, normalize=False, n_channels=3,
-                       plot=False) -> (np.ndarray, float):
+                       batch=False, plot=False) -> (np.ndarray, float):
     """
     Applies K-Means on a feature extracted by a neural network.
     Args:
@@ -83,6 +90,7 @@ def k_means_on_feature(feature: np.ndarray, n_clusters: int, max_iter=100,
         normalize: True if the image does not have values between 0 and 255
         n_channels: number of dimensions of the vector on which to apply
          K-Means
+        batch: True if batch of features
         plot: True to show the segmented image
 
     Returns:
@@ -113,7 +121,8 @@ def k_means_on_feature(feature: np.ndarray, n_clusters: int, max_iter=100,
     # get the labels array
     labels = kmeans.labels_
 
-    segmented_image = get_segmented_img(feature, centers, labels, plot=plot)
+    segmented_image = get_segmented_img(feature, centers, labels, batch,
+                                        plot=plot)
     # Sum of squared distances of samples to their closest cluster center,
     # weighted by the sample weights if provided.
     compactness = kmeans.inertia_
@@ -122,7 +131,8 @@ def k_means_on_feature(feature: np.ndarray, n_clusters: int, max_iter=100,
 
 
 def ward_on_feature(feature: np.ndarray, n_clusters: np.ndarray,
-                    normalize=False, n_channels=3, plot=False) -> np.ndarray:
+                    normalize=False, n_channels=3, batch=False, plot=False) \
+        -> np.ndarray:
     """
     Applies Ward's Hierarchical Clustering on a feature extracted by a neural
     network.
@@ -133,6 +143,7 @@ def ward_on_feature(feature: np.ndarray, n_clusters: np.ndarray,
         normalize: True if the image does not have values between 0 and 255
         n_channels: number of dimensions of the vector on which to apply
          Ward's Hierarchical Clustering
+        batch: True if batch of features
         plot: True to show the segmented image
 
     Returns:
@@ -163,7 +174,8 @@ def ward_on_feature(feature: np.ndarray, n_clusters: np.ndarray,
     # get the labels array
     labels = agg_ward.labels_
 
-    segmented_image = get_segmented_img(feature, centers, labels, plot=plot)
+    segmented_image = get_segmented_img(feature, centers, labels, batch,
+                                        plot=plot)
     return segmented_image
 
 
