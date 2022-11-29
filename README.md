@@ -1,4 +1,4 @@
-# DD2412project
+# Re-implementation of IntriguingProperties of Contrastive Losses paper
 
 Pre-trained simCLR: https://github.com/Spijkervet/SimCLR
 
