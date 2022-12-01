@@ -11,6 +11,7 @@ Re-implementation of Hamiltonian Generative Networks [paper](https://proceedings
 ```
 conda create -n re-intriguing-properties pip
 conda activate re-intriguing-properties
+conda install -c anaconda jupyter
 pip install -r requirements.txt
 ```
 
