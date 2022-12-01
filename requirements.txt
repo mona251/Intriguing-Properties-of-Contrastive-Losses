@@ -1,1 +1,8 @@
 simclr
+numpy~=1.23.3
+matplotlib~=3.5.2
+gdown
+opencv-python~=4.6.0.66
+torchvision
+scikit-learn
+setuptools
