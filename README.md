@@ -20,3 +20,10 @@ pip install -r requirements.txt
 ```
 pip install -e .
 ```
+
+
+## Generate the data
+
+To generate the images to reproduce the other experiments of the [paper](https://proceedings.neurips.cc/paper/2021/hash/628f16b29939d1b060af49f66ae0f7f8-Abstract.html) 
+see the Jupyter notebooks at [./scripts/data_generation/](https://github.com/mona251/Intriguing-Properties-of-Contrastive-Losses/tree/main/scripts/data_generation). 
+
