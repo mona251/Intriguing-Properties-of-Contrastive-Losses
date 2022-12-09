@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.cluster import KMeans, AgglomerativeClustering
+from sklearn.cluster import KMeans, AgglomerativeClustering, BisectingKMeans
 
 from src.data_generation.utils import downsample_img, normalize_img
 
@@ -21,10 +21,10 @@ def get_colors_of_clusters(n_clusters: int) -> np.ndarray:
     light_blue = [102, 255, 255]
     green = [0, 153, 76]
     yellow = [255, 255, 153]
-    violet = [204, 153, 255]
-    pink = [255, 153, 153]
     black = [0, 0, 0]
     white = [255, 255, 255]
+    violet = [204, 153, 255]
+    pink = [255, 153, 153]
     colors = [blue, orange, red, light_blue, green, yellow, violet, pink,
               black, white]
     centers = []
@@ -130,24 +130,27 @@ def k_means_on_feature(feature: np.ndarray, n_clusters: int, max_iter=100,
     return segmented_image, compactness
 
 
-def ward_on_feature(feature: np.ndarray, n_clusters: np.ndarray,
-                    normalize=False, n_channels=3, batch=False, plot=False) \
+def agglomerative_cl_on_feature(feature: np.ndarray, n_clusters: int,
+                                linkage='ward', normalize=False,
+                                n_channels=3, batch=False, plot=False) \
         -> np.ndarray:
     """
-    Applies Ward's Hierarchical Clustering on a feature extracted by a neural
+    Applies Agglomerative Clustering on a feature extracted by a neural
     network.
     Args:
         feature: feature extracted by a neural network
         n_clusters: The number of clusters to form as well as the number
          of centroids to generate
+        linkage: type of the agglomerative clustering, default is Ward
+         Hierarchical Clustering
         normalize: True if the image does not have values between 0 and 255
         n_channels: number of dimensions of the vector on which to apply
-         Ward's Hierarchical Clustering
+         Agglomerative Clustering
         batch: True if batch of features
         plot: True to show the segmented image
 
     Returns:
-        The image segmented with Ward's Hierarchical Clustering.
+        The image segmented with Agglomerative Clustering.
     """
     if plot:
         # show the image
@@ -166,7 +169,7 @@ def ward_on_feature(feature: np.ndarray, n_clusters: np.ndarray,
     pixel_values = np.float32(pixel_values)
 
     agg_ward = AgglomerativeClustering(
-        n_clusters=n_clusters, linkage='ward').fit(pixel_values)
+        n_clusters=n_clusters, linkage=linkage).fit(pixel_values)
 
     # convert back to 8 bit values
     centers = get_colors_of_clusters(n_clusters=n_clusters)
@@ -176,6 +179,58 @@ def ward_on_feature(feature: np.ndarray, n_clusters: np.ndarray,
 
     segmented_image = get_segmented_img(feature, centers, labels, batch,
                                         plot=plot)
+
+    return segmented_image
+
+
+def bisecting_k_means_on_feature(feature: np.ndarray, n_clusters: int,
+                                 normalize=False, n_channels=3, batch=False,
+                                 plot=False) -> np.ndarray:
+    """
+    Applies Bisecting K-Means, which is an iterative variant of KMeans
+    using divisive hierarchical clustering, on a feature extracted by a neural
+    network.
+    Args:
+        feature: feature extracted by a neural network
+        n_clusters: The number of clusters to form as well as the number
+         of centroids to generate
+        normalize: True if the image does not have values between 0 and 255
+        n_channels: number of dimensions of the vector on which to apply
+         Bisecting K-Means
+        batch: True if batch of features
+        plot: True to show the segmented image
+
+    Returns:
+        The image segmented with Bisecting K-Means Clustering.
+    """
+    if plot:
+        # show the image
+        plt.imshow(feature)
+        plt.show()
+
+    if normalize:
+        min_value = 0
+        max_value = 255
+        feature = normalize_img(feature, min_value, max_value,
+                                return_int_values=True)
+
+    # reshape the image to a 2D array of pixels and 3 color values (RGB)
+    pixel_values = feature.reshape((-1, n_channels))
+    # convert to float
+    pixel_values = np.float32(pixel_values)
+
+    bis_kmeans = BisectingKMeans(
+        n_clusters=n_clusters).fit(pixel_values)
+
+    # convert back to 8 bit values
+    centers = get_colors_of_clusters(n_clusters=n_clusters)
+
+    # get the labels array
+    labels = bis_kmeans.labels_
+
+    segmented_image = get_segmented_img(feature, centers, labels, batch,
+                                        plot=plot)
+
     return segmented_image
 
 
